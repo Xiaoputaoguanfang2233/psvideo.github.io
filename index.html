@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
+    <script src="videos.js"></script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>番实视频站</title>
@@ -78,23 +79,16 @@
     <div class="video-grid" id="videoGrid"></div>
 </div>
 <script>
-    // 你的视频数据列表
-    const myVideos = [
-        { name: "test1", bvid: "BV1U38CzfEkD", cover: null },
-        { name: "滚木1", cover: null },
-        { name: "滚木2", cover: null }
-    ];
-
     function load() {
         const grid = document.getElementById('videoGrid');
         grid.innerHTML = myVideos.map((v, i) => `
-                <a href="video.html?id=${i}" class="card">
-                    <div class="cover" style="${v.cover ? `background-image:url('${v.cover}')` : ''}">
-                        ${v.cover ? '' : '🎬'}
-                    </div>
-                    <div class="info"><div class="v-title">${v.name}</div></div>
-                </a>
-            `).join('');
+            <a href="video.html?id=${i}" class="card">
+                <div class="cover" style="${v.cover ? `background-image:url('${v.cover}')` : ''}">
+                    ${v.cover ? '' : '🎬'}
+                </div>
+                <div class="info"><div class="v-title">${v.name}</div></div>
+            </a>
+        `).join('');
     }
     window.onload = load;
 </script>
