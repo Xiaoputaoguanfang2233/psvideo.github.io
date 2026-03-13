@@ -29,22 +29,34 @@
     <div class="video-grid" id="videoGrid"></div>
 </div>
 <script>
-    // --- 关键：手动配置你的视频列表 ---
+    // --- 静态版视频列表：在此手动管理所有视频 ---
     const myVideos = [
-        { name: "01 门捷列夫是怎样“炼”成的.mp4", cover: "uploads/cover1.jpg" },
-        { name: "举起手来.mp4", cover: null }
+        { 
+            name: "我的B站投稿视频", 
+            bvid: "BV1U38CzfEkD", 
+            cover: "logo.png" // 暂时用logo，有封面图可以换成 uploads/xxx.jpg
+        },
+        { 
+            name: "01 门捷列夫是怎样“炼”成的.mp4", 
+            cover: null 
+        },
+        { 
+            name: "【1080P Full Movie】《举起手来》", 
+            cover: null 
+        }
     ];
 
-    function load() {
+    async function load() {
         const grid = document.getElementById('videoGrid');
+        // 静态版不再使用 API，直接循环 myVideos 数组
         grid.innerHTML = myVideos.map((v, i) => `
-            <a href="video.html?id=${i}" class="card">
-                <div class="cover" style="${v.cover ? `background-image:url('${v.cover}')` : ''}">
-                    ${v.cover ? '' : 'NO COVER'}
-                </div>
-                <div class="info"><div class="v-title">${v.name}</div></div>
-            </a>
-        `).join('');
+                <a href="video.html?id=${i}" class="card">
+                    <div class="cover" style="${v.cover ? `background-image:url('${v.cover}')` : ''}">
+                        ${v.cover ? '' : '🎬'}
+                    </div>
+                    <div class="info"><div class="v-title">${v.name}</div></div>
+                </a>
+            `).join('');
     }
     window.onload = load;
 </script>
