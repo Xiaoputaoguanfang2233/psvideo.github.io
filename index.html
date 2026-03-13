@@ -2,30 +2,13 @@
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
-    <title>视频站</title>
+    <title>视频站 - GitHub版</title>
     <style>
-        :root { --primary: #009A44; --bg: #f1f2f3; }  /* 主色改为绿色 */
+        :root { --primary: #009A44; --bg: #f1f2f3; }
         body { margin: 0; background: var(--bg); font-family: sans-serif; }
         header { height: 64px; background: #fff; display: flex; align-items: center; justify-content: space-between; padding: 0 40px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
-        .logo {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            text-decoration: none;
-            color: var(--primary);
-            font-size: 24px;
-            font-weight: bold;
-            height: 100%;
-        }
-        .logo img {
-            display: block;
-            height: 40px;
-            width: auto;
-        }
-        .search-form { display: flex; gap: 8px; }
-        .search-input { padding: 8px 12px; border-radius: 20px; border: 1px solid #ddd; width: 200px; outline: none; transition: 0.2s; }
-        .search-input:focus { border-color: var(--primary); }
-        .search-btn { background: var(--primary); color: white; border: none; border-radius: 20px; padding: 8px 16px; cursor: pointer; font-weight: 500; }
+        .logo { display: flex; align-items: center; gap: 8px; text-decoration: none; color: var(--primary); font-size: 24px; font-weight: bold; }
+        .logo img { height: 40px; }
         .container { max-width: 1200px; margin: 30px auto; padding: 0 20px; }
         .video-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 20px; }
         .card { background: #fff; border-radius: 12px; overflow: hidden; text-decoration: none; color: #18191c; transition: 0.3s; }
@@ -33,38 +16,35 @@
         .cover { width: 100%; aspect-ratio: 16/9; background: #e3e5e7; display: flex; align-items: center; justify-content: center; background-size: cover; background-position: center; color: #999; }
         .info { padding: 12px; }
         .v-title { font-size: 15px; font-weight: 500; height: 40px; line-height: 20px; overflow: hidden; }
-        @media (max-width: 600px) {
-            header { padding: 0 20px; }
-            .search-input { width: 140px; }
-        }
     </style>
 </head>
 <body>
 <header>
-    <a href="/" class="logo">
-        <img src="/logo.png" alt="视频站">
-        <span class="site-title">视频站</span>
+    <a href="index.html" class="logo">
+        <img src="logo.png" alt="视频站">
+        <span>视频站</span>
     </a>
-    <form action="/search.html" method="GET" class="search-form">
-        <input type="text" name="q" class="search-input" placeholder="搜索视频..." value="">
-        <button type="submit" class="search-btn">搜索</button>
-    </form>
 </header>
 <div class="container">
     <div class="video-grid" id="videoGrid"></div>
 </div>
 <script>
-    async function load() {
-        const res = await fetch('/api/videos');
-        const videos = await res.json();
-        document.getElementById('videoGrid').innerHTML = videos.map((v, i) => `
-                <a href="/v/${i}" class="card">
-                    <div class="cover" style="${v.cover ? `background-image:url('${v.cover}')` : ''}">
-                        ${v.cover ? '' : 'NO COVER'}
-                    </div>
-                    <div class="info"><div class="v-title">${v.name}</div></div>
-                </a>
-            `).join('');
+    // --- 关键：手动配置你的视频列表 ---
+    const myVideos = [
+        { name: "01 门捷列夫是怎样“炼”成的.mp4", cover: "uploads/cover1.jpg" },
+        { name: "举起手来.mp4", cover: null }
+    ];
+
+    function load() {
+        const grid = document.getElementById('videoGrid');
+        grid.innerHTML = myVideos.map((v, i) => `
+            <a href="video.html?id=${i}" class="card">
+                <div class="cover" style="${v.cover ? `background-image:url('${v.cover}')` : ''}">
+                    ${v.cover ? '' : 'NO COVER'}
+                </div>
+                <div class="info"><div class="v-title">${v.name}</div></div>
+            </a>
+        `).join('');
     }
     window.onload = load;
 </script>
