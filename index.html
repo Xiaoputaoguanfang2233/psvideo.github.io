@@ -2,54 +2,88 @@
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>番实视频站</title>
-<style>
-    :root { --primary: #009A44; --bg: #f1f2f3; }
-    body { margin: 0; background: var(--bg); font-family: sans-serif; }
-    
-    /* 导航栏适配 */
-    header { 
-        height: 64px; 
-        background: #fff; 
-        display: flex; 
-        align-items: center; 
-        padding: 0 40px; 
-        box-shadow: 0 2px 10px rgba(0,0,0,0.05); 
-    }
-    .logo { display: flex; align-items: center; gap: 8px; text-decoration: none; color: var(--primary); font-size: 24px; font-weight: bold; }
-    .logo img { height: 40px; }
+    <style>
+        :root { --primary: #009A44; --bg: #f1f2f3; }
+        body { margin: 0; background: var(--bg); font-family: sans-serif; overflow-x: hidden; }
+        
+        header { 
+            height: 64px; 
+            background: #fff; 
+            display: flex; 
+            align-items: center; 
+            justify-content: space-between; 
+            padding: 0 20px; 
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
 
-    .container { max-width: 1200px; margin: 30px auto; padding: 0 20px; }
-    
-    /* 视频网格适配：手机端 2 列，电脑端自动填充 */
-    .video-grid { 
-        display: grid; 
-        grid-template-columns: repeat(2, 1fr); /* 默认手机端 2 列 */
-        gap: 12px; 
-    }
+        .logo { display: flex; align-items: center; gap: 8px; text-decoration: none; color: var(--primary); font-size: 20px; font-weight: bold; flex-shrink: 0; }
+        .logo img { height: 36px; }
 
-    .card { background: #fff; border-radius: 12px; overflow: hidden; text-decoration: none; color: #18191c; transition: 0.3s; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
-    .card:hover { transform: translateY(-5px); }
-    .cover { width: 100%; aspect-ratio: 16/9; background: #e3e5e7; display: flex; align-items: center; justify-content: center; background-size: cover; background-position: center; color: #999; }
-    .info { padding: 8px; }
-    .v-title { font-size: 14px; font-weight: 500; line-height: 1.4; height: 40px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+        /* --- 伸缩搜索框设计 --- */
+        .search-form { display: flex; align-items: center; position: relative; }
+        .search-input { 
+            padding: 8px 15px; 
+            border-radius: 20px; 
+            border: 1px solid #ddd; 
+            width: 120px; /* 默认宽度 */
+            outline: none; 
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1); /* 平滑动画 */
+            background: #f4f4f4;
+        }
+        .search-input:focus { 
+            width: 240px; /* 聚焦时长 */
+            border-color: var(--primary); 
+            background: #fff;
+            box-shadow: 0 0 8px rgba(0,154,68,0.2);
+        }
+        .search-btn { 
+            margin-left: -35px; 
+            background: none; 
+            border: none; 
+            cursor: pointer; 
+            padding: 5px;
+            color: #666;
+        }
 
-    /* 电脑端大屏幕适配 */
-    @media (min-width: 768px) {
-        header { padding: 0 40px; }
-        .video-grid { grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 20px; }
-        .info { padding: 12px; }
-        .v-title { font-size: 15px; }
-    }
+        .container { max-width: 1200px; margin: 20px auto; padding: 0 15px; }
 
-    /* 极小屏幕适配 */
-    @media (max-width: 480px) {
-        header { padding: 0 15px; height: 56px; }
-        .logo { font-size: 18px; }
-        .logo img { height: 30px; }
-        .container { margin: 15px auto; padding: 0 10px; }
-    }
-</style>
+        /* --- 视频间距优化 --- */
+        .video-grid { 
+            display: grid; 
+            grid-template-columns: repeat(2, 1fr); /* 手机端 2 列 */
+            gap: 25px; /* 显着加大视频间的间隔 */
+        }
+
+        .card { background: #fff; border-radius: 12px; overflow: hidden; text-decoration: none; color: #18191c; transition: 0.3s; box-shadow: 0 2px 12px rgba(0,0,0,0.08); }
+        .card:hover { transform: translateY(-5px); box-shadow: 0 8px 20px rgba(0,0,0,0.12); }
+        
+        .cover { width: 100%; aspect-ratio: 16/9; background: #e3e5e7; display: flex; align-items: center; justify-content: center; background-size: cover; background-position: center; color: #999; }
+        .info { padding: 15px; }
+        .v-title { font-size: 15px; font-weight: 500; line-height: 1.4; height: 42px; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
+
+        /* 电脑端适配 */
+        @media (min-width: 768px) {
+            header { padding: 0 40px; }
+            .logo { font-size: 24px; }
+            .video-grid { 
+                grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); 
+                gap: 30px; /* 电脑端间距更大 */
+            }
+            .search-input { width: 180px; }
+            .search-input:focus { width: 350px; }
+        }
+
+        /* 极小屏幕隐藏文字保留 Logo */
+        @media (max-width: 400px) {
+            .logo span { display: none; }
+            .search-input:focus { width: 160px; }
+        }
+    </style>
 </head>
 <body>
 <header>
@@ -57,28 +91,23 @@
         <img src="logo.png" alt="番实视频站">
         <span>番实视频站</span>
     </a>
+    <form action="search.html" method="GET" class="search-form">
+        <input type="text" name="q" class="search-input" placeholder="搜索视频...">
+        <button type="submit" class="search-btn">🔍</button>
+    </form>
 </header>
 <div class="container">
     <div class="video-grid" id="videoGrid"></div>
 </div>
 <script>
+    // 你的视频数据列表
     const myVideos = [
-        { 
-            name: "test1", 
-            bvid: "BV1U38CzfEkD", 
-            cover: null
-        },
-        { 
-            name: "滚木1", 
-            cover: null 
-        },
-        { 
-            name: "滚木2", 
-            cover: null 
-        }
+        { name: "test1", bvid: "BV1U38CzfEkD", cover: null },
+        { name: "滚木1", cover: null },
+        { name: "滚木2", cover: null }
     ];
 
-    async function load() {
+    function load() {
         const grid = document.getElementById('videoGrid');
         grid.innerHTML = myVideos.map((v, i) => `
                 <a href="video.html?id=${i}" class="card">
