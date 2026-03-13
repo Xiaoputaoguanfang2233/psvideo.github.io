@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <title>正在播放 - 视频站</title>
+  <style>
+    :root { --primary: #009A44; }  /* 主色改为绿色 */
+    body { margin: 0; background: #f1f2f3; font-family: sans-serif; }
+    header { height: 60px; background: #fff; display: flex; align-items: center; padding: 0 40px; }
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      text-decoration: none;
+      color: var(--primary);
+      font-size: 22px;
+      font-weight: bold;
+      height: 100%;
+    }
+    .logo img {
+      display: block;
+      height: 40px;
+      width: auto;
+    }
+    .main { max-width: 1200px; margin: 20px auto; padding: 0 20px; }
+
+    /* 两列布局：左侧主内容，右侧推荐 */
+    .content-wrapper {
+      display: flex;
+      gap: 20px;
+    }
+    .left-column {
+      flex: 2;
+      min-width: 0;
+    }
+    .right-column {
+      flex: 1;
+      min-width: 240px;
+    }
+
+    .player-box { background: #000; border-radius: 10px; overflow: hidden; }
+    video { width: 100%; display: block; }
+    .v-info { margin-top: 20px; background: #fff; padding: 25px; border-radius: 10px; }
+    .actions { display: flex; gap: 30px; margin-top: 20px; color: #61666d; }
+    .action-item { cursor: pointer; display: flex; align-items: center; gap: 5px; font-size: 16px; }
+    .action-item:hover { color: var(--primary); }
+
+    /* 评论区样式 */
+    .comments-section {
+      margin-top: 20px;
+      background: #fff;
+      border-radius: 10px;
+      padding: 25px;
+    }
+    .comment-form input,
+    .comment-form textarea {
+      width: 100%;
+      padding: 10px;
+      margin-bottom: 10px;
+      border: 1px solid #ddd;
+      border-radius: 6px;
+      box-sizing: border-box;
+      font-family: inherit;
+    }
+    .comment-form textarea { min-height: 80px; resize: vertical; }
+    .comment-form button {
+      background: var(--primary);
+      color: white;
+      border: none;
+      border-radius: 20px;
+      padding: 10px 20px;
+      cursor: pointer;
+      font-weight: 500;
+    }
+    .comment-item {
+      border-bottom: 1px solid #f0f0f0;
+      padding: 15px 0;
+    }
+    .comment-item:last-child { border-bottom: none; }
+    .comment-item strong { color: var(--primary); margin-right: 10px; }
+    .comment-time { color: #999; font-size: 12px; }
+    .comment-item p { margin: 8px 0 0; line-height: 1.5; }
+    .no-comment { color: #999; text-align: center; padding: 20px 0; }
+
+    /* 相关推荐样式 */
+    .recommend-box {
+      background: #fff;
+      border-radius: 10px;
+      padding: 20px;
+      position: sticky;
+      top: 20px;
+    }
+    .recommend-box h3 {
+      margin: 0 0 15px 0;
+      font-size: 18px;
+      color: #18191c;
+    }
+    .recommend-list {
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+    }
+    .recommend-item {
+      display: flex;
+      gap: 12px;
+      text-decoration: none;
+      color: #18191c;
+      transition: 0.2s;
+      border-radius: 8px;
+      overflow: hidden;
+    }
+    .recommend-item:hover {
+      background: #f8f9fa;
+      transform: translateY(-2px);
+    }
+    .rec-cover {
+      width: 80px;
+      height: 45px;
+      background: #e3e5e7;
+      background-size: cover;
+      background-position: center;
+      border-radius: 6px;
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #999;
+      font-size: 12px;
+    }
+    .rec-info {
+      flex: 1;
+      min-width: 0;
+    }
+    .rec-title {
+      font-size: 14px;
+      line-height: 1.4;
+      height: 40px;
+      overflow: hidden;
+      word-break: break-word;
+    }
+    .rec-empty {
+      color: #999;
+      text-align: center;
+      padding: 20px 0;
+    }
+
+    @media (max-width: 800px) {
+      .content-wrapper {
+        flex-direction: column;
+      }
+      .recommend-box {
+        position: static;
+      }
+    }
+  </style>
+</head>
+<body>
+<header>
+  <a href="/" class="logo">
+    <img src="/logo.png" alt="视频站">
+    <span>视频站</span>
+  </a>
+</header>
+<div class="main">
+  <div class="content-wrapper">
+    <!-- 左侧主内容 -->
+    <div class="left-column">
+      <div class="player-box"><video id="player" controls autoplay></video></div>
+      <div class="v-info">
+        <h1 id="title" style="font-size:20px; margin:0;">正在加载...</h1>
+        <div class="actions">
+          <div class="action-item" onclick="interact('likes')">👍 <span id="likes">0</span></div>
+        </div>
+      </div>
+
+      <!-- 评论区 -->
+      <div class="comments-section">
+        <h3>评论</h3>
+        <div class="comment-form">
+          <input type="text" id="commentAuthor" placeholder="昵称（可选）" value="匿名">
+          <textarea id="commentContent" placeholder="写下你的评论..."></textarea>
+          <button onclick="submitComment()">发表评论</button>
+        </div>
+        <div id="commentList" class="comment-list"></div>
+      </div>
+    </div>
+
+    <!-- 右侧推荐栏 -->
+    <div class="right-column">
+      <div class="recommend-box">
+        <h3>相关推荐</h3>
+        <div id="recommendList" class="recommend-list"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  let currentFileName = "";
+  let currentVideoIndex = null;
+  let allVideos = [];
+
+  function escapeHTML(str) {
+    return str.replace(/[&<>"]/g, function(m) {
+      if (m === '&') return '&amp;';
+      if (m === '<') return '&lt;';
+      if (m === '>') return '&gt;';
+      if (m === '"') return '&quot;';
+      return m;
+    });
+  }
+
+  function shuffleArray(arr) {
+    for (let i = arr.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [arr[i], arr[j]] = [arr[j], arr[i]];
+    }
+    return arr;
+  }
+
+  function loadRecommendations() {
+    const recommendDiv = document.getElementById('recommendList');
+    if (!allVideos.length || currentVideoIndex === null) {
+      recommendDiv.innerHTML = '<div class="rec-empty">暂无推荐</div>';
+      return;
+    }
+
+    const others = allVideos.filter((v, idx) => idx !== currentVideoIndex);
+    if (others.length === 0) {
+      recommendDiv.innerHTML = '<div class="rec-empty">没有其他视频</div>';
+      return;
+    }
+
+    const shuffled = shuffleArray([...others]);
+    const recommendations = shuffled.slice(0, 4);
+
+    recommendDiv.innerHTML = recommendations.map(v => {
+      const coverStyle = v.cover ? `background-image: url('${v.cover}');` : '';
+      const coverContent = v.cover ? '' : '无图';
+      return `
+        <a href="/v/${v.idx}" class="recommend-item">
+          <div class="rec-cover" style="${coverStyle}">${coverContent}</div>
+          <div class="rec-info">
+            <div class="rec-title">${escapeHTML(v.name)}</div>
+          </div>
+        </a>
+      `;
+    }).join('');
+  }
+
+  async function init() {
+    const id = window.location.pathname.split('/').pop();
+    const res = await fetch('/api/videos');
+    allVideos = (await res.json()).map((v, idx) => ({ ...v, idx }));
+
+    const index = parseInt(id, 10);
+    const video = allVideos[index];
+
+    if (video) {
+      currentVideoIndex = index;
+      currentFileName = video.name;
+      document.getElementById('title').innerText = currentFileName;
+      document.getElementById('player').src = `/videos/${encodeURIComponent(currentFileName)}`;
+      loadStats();
+      loadComments();
+      loadRecommendations();
+    } else {
+      document.getElementById('title').innerText = '视频不存在';
+    }
+  }
+
+  async function loadStats() {
+    const res = await fetch(`/api/interaction/${encodeURIComponent(currentFileName)}`);
+    const data = await res.json();
+    ['likes', 'coins', 'collects'].forEach(type => {
+      const el = document.getElementById(type);
+      if (el) el.innerText = data[type] || 0;
+    });
+  }
+
+  async function interact(type) {
+    const res = await fetch('/api/interaction', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ name: currentFileName, type: type })
+    });
+    const data = await res.json();
+    document.getElementById(type).innerText = data[type];
+  }
+
+  async function loadComments() {
+    const res = await fetch(`/api/interaction/${encodeURIComponent(currentFileName)}`);
+    const data = await res.json();
+    const comments = data.comments || [];
+    const list = document.getElementById('commentList');
+    if (comments.length === 0) {
+      list.innerHTML = '<p class="no-comment">暂无评论，快来抢沙发吧~</p>';
+      return;
+    }
+    list.innerHTML = comments.map(c => `
+      <div class="comment-item">
+        <strong>${escapeHTML(c.author)}</strong>
+        <span class="comment-time">${new Date(c.time).toLocaleString()}</span>
+        <p>${escapeHTML(c.content)}</p>
+      </div>
+    `).join('');
+  }
+
+  async function submitComment() {
+    const author = document.getElementById('commentAuthor').value.trim() || '匿名';
+    const content = document.getElementById('commentContent').value.trim();
+    if (!content) {
+      alert('评论内容不能为空');
+      return;
+    }
+    const res = await fetch('/api/comments', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ name: currentFileName, author, content })
+    });
+    if (res.ok) {
+      document.getElementById('commentContent').value = '';
+      loadComments();
+    } else {
+      alert('评论失败，请稍后重试');
+    }
+  }
+
+  init();
+</script>
+</body>
+</html>
