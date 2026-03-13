@@ -2,7 +2,7 @@
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
-    <title>视频站 - GitHub版</title>
+    <title>番实视频站</title>
     <style>
         :root { --primary: #009A44; --bg: #f1f2f3; }
         body { margin: 0; background: var(--bg); font-family: sans-serif; }
@@ -21,34 +21,32 @@
 <body>
 <header>
     <a href="index.html" class="logo">
-        <img src="logo.png" alt="视频站">
-        <span>视频站</span>
+        <img src="logo.png" alt="番实视频站">
+        <span>番实视频站</span>
     </a>
 </header>
 <div class="container">
     <div class="video-grid" id="videoGrid"></div>
 </div>
 <script>
-    // --- 静态版视频列表：在此手动管理所有视频 ---
     const myVideos = [
         { 
-            name: "我的B站投稿视频", 
+            name: "test1", 
             bvid: "BV1U38CzfEkD", 
-            cover: "logo.png" // 暂时用logo，有封面图可以换成 uploads/xxx.jpg
+            cover: null
         },
         { 
-            name: "01 门捷列夫是怎样“炼”成的.mp4", 
+            name: "滚木1", 
             cover: null 
         },
         { 
-            name: "【1080P Full Movie】《举起手来》", 
+            name: "滚木2", 
             cover: null 
         }
     ];
 
     async function load() {
         const grid = document.getElementById('videoGrid');
-        // 静态版不再使用 API，直接循环 myVideos 数组
         grid.innerHTML = myVideos.map((v, i) => `
                 <a href="video.html?id=${i}" class="card">
                     <div class="cover" style="${v.cover ? `background-image:url('${v.cover}')` : ''}">
