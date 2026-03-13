@@ -3,18 +3,42 @@
 <head>
   <meta charset="UTF-8">
   <title>正在播放 - 视频站</title>
-  <style>
-    :root { --primary: #009A44; }
-    body { margin: 0; background: #f1f2f3; font-family: sans-serif; }
-    header { height: 60px; background: #fff; display: flex; align-items: center; padding: 0 40px; }
-    .logo { display: flex; align-items: center; gap: 8px; text-decoration: none; color: var(--primary); font-size: 22px; font-weight: bold; }
-    .logo img { height: 40px; }
-    .main { max-width: 1200px; margin: 20px auto; padding: 0 20px; }
-    .player-box { background: #000; border-radius: 10px; overflow: hidden; }
-    video { width: 100%; display: block; }
-    .v-info { margin-top: 20px; background: #fff; padding: 25px; border-radius: 10px; }
-  </style>
-</head>
+<style>
+  :root { --primary: #009A44; }
+  body { margin: 0; background: #f1f2f3; font-family: sans-serif; }
+  header { height: 60px; background: #fff; display: flex; align-items: center; padding: 0 40px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
+  .logo { display: flex; align-items: center; gap: 8px; text-decoration: none; color: var(--primary); font-size: 22px; font-weight: bold; }
+  .logo img { height: 40px; }
+  
+  /* 关键修改：单列居中布局 */
+  .main { 
+    max-width: 1000px; /* 限制最大宽度，防止在大屏幕上太宽 */
+    margin: 20px auto; 
+    padding: 0 20px; 
+  }
+
+  .player-box { 
+    background: #000; 
+    border-radius: 12px; 
+    overflow: hidden; 
+    width: 100%;
+    aspect-ratio: 16 / 9; /* 强制锁定 16:9 比例，防止压扁 */
+    box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+  }
+
+  iframe, video { width: 100%; height: 100%; display: block; border: none; }
+
+  .v-info { 
+    margin-top: 20px; 
+    background: #fff; 
+    padding: 25px; 
+    border-radius: 12px; 
+    box-shadow: 0 2px 12px rgba(0,0,0,0.05);
+  }
+  
+  .hint { color: #999; font-size: 13px; margin-top: 10px; display: block; }
+</style>
+
 <body>
 <header>
   <a href="index.html" class="logo">
@@ -22,11 +46,14 @@
     <span>视频站</span>
   </a>
 </header>
+
 <div class="main">
-  <div class="player-box"><video id="player" controls autoplay></video></div>
+  <div class="player-box" id="playerContainer">
+    </div>
+
   <div class="v-info">
-    <h1 id="title" style="font-size:20px; margin:0;">正在加载...</h1>
-    <p style="color:#999; font-size:14px; margin-top:10px;">提示：静态版暂不支持保存点赞和评论</p>
+    <h1 id="title" style="font-size: 20px; margin: 0; color: #18191c;">正在加载...</h1>
+    <span class="hint">提示：静态部署版暂不支持点赞和评论保存</span>
   </div>
 </div>
 
