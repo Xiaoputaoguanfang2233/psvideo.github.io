@@ -2,7 +2,7 @@
 <html lang="zh-CN">
 <head>
   <meta charset="UTF-8">
-  <title>正在播放 - 视频站</title>
+  <title>正在播放 - 番实视频站</title>
 <style>
   :root { --primary: #009A44; }
   body { margin: 0; background: #f1f2f3; font-family: sans-serif; }
@@ -10,9 +10,8 @@
   .logo { display: flex; align-items: center; gap: 8px; text-decoration: none; color: var(--primary); font-size: 22px; font-weight: bold; }
   .logo img { height: 40px; }
   
-  /* 关键修改：单列居中布局 */
   .main { 
-    max-width: 1000px; /* 限制最大宽度，防止在大屏幕上太宽 */
+    max-width: 1000px;
     margin: 20px auto; 
     padding: 0 20px; 
   }
@@ -22,7 +21,7 @@
     border-radius: 12px; 
     overflow: hidden; 
     width: 100%;
-    aspect-ratio: 16 / 9; /* 强制锁定 16:9 比例，防止压扁 */
+    aspect-ratio: 16 / 9;
     box-shadow: 0 10px 30px rgba(0,0,0,0.2);
   }
 
@@ -42,8 +41,8 @@
 <body>
 <header>
   <a href="index.html" class="logo">
-    <img src="logo.png" alt="视频站">
-    <span>视频站</span>
+    <img src="logo.png" alt="番实视频站">
+    <span>番实视频站</span>
   </a>
 </header>
 
@@ -53,16 +52,16 @@
 
   <div class="v-info">
     <h1 id="title" style="font-size: 20px; margin: 0; color: #18191c;">正在加载...</h1>
-    <span class="hint">提示：静态部署版暂不支持点赞和评论保存</span>
+    <span class="hint">静态部署版暂不支持点赞和评论保存</span>
   </div>
 </div>
 
 <script>
   // 必须与 index.html 的列表顺序完全一致
   const myVideos = [
-      { name: "我的B站投稿视频", bvid: "BV1U38CzfEkD" },
-      { name: "01 门捷列夫是怎样“炼”成的.mp4" },
-      { name: "【1080P Full Movie】《举起手来》" }
+      { name: "test", bvid: "BV1U38CzfEkD" },
+      { name: "滚木" },
+      { name: "滚木" }
   ];
 
   let currentFileName = "";
@@ -71,7 +70,6 @@
     const urlParams = new URLSearchParams(window.location.search);
     const id = urlParams.get('id');
     const video = myVideos[id];
-    // 这里的 playerContainer 对应你 HTML 中包裹播放器的 div
     const container = document.querySelector('.player-box'); 
 
     if (video) {
@@ -79,14 +77,12 @@
       document.getElementById('title').innerText = currentFileName;
 
       if (video.bvid) {
-        // 插入你提供的 B 站嵌入代码，并加上高清和自适应参数
         container.innerHTML = `
           <iframe src="//player.bilibili.com/player.html?bvid=${video.bvid}&page=1&high_quality=1&as_wide=1" 
             scrolling="no" border="0" frameborder="no" framespacing="0" allowfullscreen="true" 
             style="width:100%; height:100%; border:none;">
           </iframe>`;
       } else {
-        // 播放 uploads 文件夹下的本地视频
         container.innerHTML = `
           <video id="player" controls autoplay style="width:100%; height:100%;">
             <source src="uploads/${encodeURIComponent(currentFileName)}" type="video/mp4">
@@ -99,7 +95,6 @@
     }
   }
 
-  // 简单的静态推荐逻辑
   function loadStaticRecs(currentId) {
     const list = document.getElementById('recommendList');
     const others = myVideos.map((v, i) => ({...v, id: i})).filter(v => v.id != currentId);
