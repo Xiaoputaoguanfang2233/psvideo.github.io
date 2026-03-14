@@ -23,12 +23,155 @@
             gap: 15px; 
         }
 
+        /* 响应式设计 */
+        @media (max-width: 768px) {
+            header {
+                height: auto;
+                padding: 10px 15px;
+                flex-wrap: wrap;
+                gap: 10px;
+            }
+            
+            header > div:first-of-type {
+                flex: 1 1 100%;
+                margin-left: 0 !important;
+                max-width: none !important;
+            }
+            
+            .logo {
+                font-size: 18px;
+            }
+            
+            .logo img {
+                height: 30px;
+            }
+            
+            #uploadBtn {
+                padding: 6px 12px;
+                font-size: 14px;
+            }
+            
+            .container {
+                margin: 15px auto;
+            }
+            
+            .video-grid {
+                grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+                gap: 12px;
+            }
+            
+            /* 过滤和排序选项 */
+            .container > div:first-of-type {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 10px;
+            }
+            
+            /* 上传模态框 */
+            #uploadModal > div {
+                width: 95%;
+                max-width: 400px;
+                padding: 15px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .video-grid {
+                grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+                gap: 10px;
+            }
+            
+            .info {
+                font-size: 12px;
+                height: 36px;
+            }
+        }
+
         .video-card { 
             background: #fff; border-radius: 8px; overflow: hidden; 
-            text-decoration: none; color: #18191c; transition: 0.3s; 
+            text-decoration: none; color: #18191c; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); 
             box-shadow: 0 2px 8px rgba(0,0,0,0.05); display: flex; flex-direction: column; 
+            transform: translateY(0); opacity: 1; 
         }
-        .video-card:hover { transform: translateY(-3px); box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
+        .video-card:hover { transform: translateY(-5px) scale(1.02); box-shadow: 0 8px 20px rgba(0,0,0,0.12); }
+        
+        /* 页面加载动画 */
+        @keyframes fadeIn { 
+            from { opacity: 0; transform: translateY(20px); } 
+            to { opacity: 1; transform: translateY(0); } 
+        }
+        
+        /* 旋转动画 */
+        @keyframes spin { 
+            0% { transform: rotate(0deg); } 
+            100% { transform: rotate(360deg); } 
+        }
+        
+        .video-grid { 
+            display: grid; 
+            grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); 
+            gap: 15px; 
+        }
+        
+        .video-card { 
+            opacity: 0; 
+            transform: translateY(20px); 
+        }
+        
+        .video-card.animate { 
+            animation: fadeIn 0.4s ease-out forwards; 
+        }
+        
+        /* 交错动画延迟 */
+        .video-card.animate:nth-child(1) { animation-delay: 0.1s; }
+        .video-card.animate:nth-child(2) { animation-delay: 0.2s; }
+        .video-card.animate:nth-child(3) { animation-delay: 0.3s; }
+        .video-card.animate:nth-child(4) { animation-delay: 0.4s; }
+        .video-card.animate:nth-child(5) { animation-delay: 0.5s; }
+        .video-card.animate:nth-child(6) { animation-delay: 0.6s; }
+        .video-card.animate:nth-child(7) { animation-delay: 0.7s; }
+        .video-card.animate:nth-child(8) { animation-delay: 0.8s; }
+        
+        /* 搜索框动画 */
+        #searchInput { 
+            transition: all 0.3s ease; 
+        }
+        #searchInput:focus { 
+            background: #fff; 
+            box-shadow: 0 0 0 2px rgba(0, 154, 68, 0.2); 
+        }
+        
+        /* 按钮动画 */
+        #uploadBtn { 
+            transition: all 0.3s ease; 
+            position: relative; 
+            overflow: hidden; 
+        }
+        #uploadBtn:hover { 
+            transform: translateY(-2px); 
+            box-shadow: 0 4px 12px rgba(0, 154, 68, 0.3); 
+        }
+        #uploadBtn:active { 
+            transform: translateY(0); 
+        }
+        
+        /* 模态框动画 */
+        #uploadModal { 
+            opacity: 0; 
+            visibility: hidden; 
+            transition: all 0.3s ease; 
+        }
+        #uploadModal.show { 
+            opacity: 1; 
+            visibility: visible; 
+        }
+        #uploadModal > div { 
+            transform: scale(0.9); 
+            transition: transform 0.3s ease; 
+        }
+        #uploadModal.show > div { 
+            transform: scale(1); 
+        }
         
         /* 封面容器：保持 16:9 比例 */
         .cover-box { 
@@ -58,44 +201,382 @@
         <img src="logo.png" alt="Logo">
         <span>番实视频站</span>
     </a>
+    <div style="margin-left: 30px; flex: 1; max-width: 500px;">
+        <div style="position: relative;">
+            <input type="text" id="searchInput" placeholder="搜索视频..." style="width: 100%; padding: 8px 12px; padding-right: 35px; border: 1px solid #e3e5e7; border-radius: 20px; background: #f1f2f3; outline: none;">
+            <button id="searchBtn" style="position: absolute; right: 8px; top: 50%; transform: translateY(-50%); background: none; border: none; cursor: pointer; color: #61666d;">🔍</button>
+        </div>
+    </div>
+    <div style="margin-left: 15px; display: flex; align-items: center; gap: 15px;">
+        <button id="uploadBtn" style="padding: 8px 16px; background: var(--primary); color: white; border: none; border-radius: 6px; font-weight: bold; cursor: pointer;">上传视频</button>
+    </div>
 </header>
 
+<!-- 上传模态框 -->
+<div id="uploadModal" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; display: none; align-items: center; justify-content: center;">
+    <div style="background: white; padding: 20px; border-radius: 8px; width: 90%; max-width: 500px;">
+        <h3 style="margin-top: 0; color: #18191c;">上传视频</h3>
+        <form id="uploadForm" style="margin-top: 20px;">
+            <input type="file" id="videoFile" accept=".mp4" style="width: 100%; margin-bottom: 15px;">
+            <div style="display: flex; gap: 10px; justify-content: flex-end;">
+                <button type="button" id="cancelUpload" style="padding: 8px 16px; background: #f1f2f3; border: none; border-radius: 6px; cursor: pointer;">取消</button>
+                <button type="submit" style="padding: 8px 16px; background: var(--primary); color: white; border: none; border-radius: 6px; cursor: pointer;">上传</button>
+            </div>
+        </form>
+        <div id="uploadProgress" style="margin-top: 15px; display: none;">
+            <div style="height: 8px; background: #f1f2f3; border-radius: 4px; overflow: hidden;">
+                <div id="progressBar" style="height: 100%; background: var(--primary); width: 0%; transition: width 0.3s;"></div>
+            </div>
+            <p id="progressText" style="font-size: 12px; color: #61666d; margin-top: 5px;">0%</p>
+        </div>
+    </div>
+</div>
+
 <div class="container">
+    <!-- 统计信息 -->
+    <div style="background: white; border-radius: 12px; padding: 20px; margin-bottom: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.08); transition: all 0.3s ease; position: relative; overflow: hidden;">
+        <div style="display: flex; gap: 40px; position: relative; z-index: 1;">
+            <div style="flex: 1; text-align: center; padding: 10px; border-radius: 8px; transition: all 0.3s ease; background: rgba(0, 154, 68, 0.05);">
+                <p style="font-size: 14px; color: #61666d; margin: 0 0 8px 0; font-weight: 500;">视频总数</p>
+                <p style="font-size: 32px; font-weight: bold; color: var(--primary); margin: 0; transition: all 0.3s ease;" id="totalVideos">0</p>
+            </div>
+            <div style="flex: 1; text-align: center; padding: 10px; border-radius: 8px; transition: all 0.3s ease; background: rgba(0, 154, 68, 0.05);">
+                <p style="font-size: 14px; color: #61666d; margin: 0 0 8px 0; font-weight: 500;">分类总数</p>
+                <p style="font-size: 32px; font-weight: bold; color: var(--primary); margin: 0; transition: all 0.3s ease;" id="totalCategories">0</p>
+            </div>
+        </div>
+        <!-- 背景装饰 -->
+        <div style="position: absolute; top: 0; right: 0; width: 100px; height: 100px; background: var(--primary); opacity: 0.05; border-radius: 0 12px 0 100px;"></div>
+    </div>
+    
+    <!-- 排序和筛选选项 -->
+    <div style="background: white; border-radius: 16px; padding: 20px; margin-bottom: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.08); transition: all 0.3s ease; position: relative; overflow: hidden;">
+        <div style="display: flex; align-items: center; gap: 25px; flex-wrap: wrap; position: relative; z-index: 1;">
+            <!-- 分类筛选 -->
+            <div style="display: flex; align-items: center; gap: 12px;">
+                <label style="font-size: 14px; color: #61666d; font-weight: 600; white-space: nowrap;">分类：</label>
+                <select id="categoryFilter" style="padding: 10px 20px; border: 2px solid #f0f0f0; border-radius: 12px; background: white; outline: none; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); min-width: 140px; font-size: 14px; box-shadow: 0 2px 4px rgba(0,0,0,0.05);">
+                    <option value="">全部分类</option>
+                    <!-- 分类选项将通过 JavaScript 动态添加 -->
+                </select>
+            </div>
+            
+            <!-- 排序选项 -->
+            <div style="display: flex; align-items: center; gap: 12px;">
+                <label style="font-size: 14px; color: #61666d; font-weight: 600; white-space: nowrap;">排序：</label>
+                <select id="sortOption" style="padding: 10px 20px; border: 2px solid #f0f0f0; border-radius: 12px; background: white; outline: none; transition: all 0.3s cubic-bezier(0.4, 0, 0, 1); min-width: 140px; font-size: 14px; box-shadow: 0 2px 4px rgba(0,0,0,0.05);">
+                    <option value="name_asc">名称 ↑</option>
+                    <option value="name_desc">名称 ↓</option>
+                    <option value="time_asc">时间 ↑</option>
+                    <option value="time_desc">时间 ↓</option>
+                </select>
+            </div>
+        </div>
+        <!-- 背景装饰 -->
+        <div style="position: absolute; bottom: 0; left: 0; width: 120px; height: 120px; background: var(--primary); opacity: 0.05; border-radius: 0 100px 0 16px;"></div>
+    </div>
     <div class="video-grid" id="videoGrid">正在同步视频库...</div>
 </div>
 
 <script>
-    async function load() {
+    async function load(searchKeyword = '', category = '', sort = 'name_asc') {
         const grid = document.getElementById('videoGrid');
+        
+        // 显示加载动画
+        grid.innerHTML = `
+            <div style="grid-column:1/-1; text-align:center; padding: 60px 0;">
+                <div style="display: inline-block; width: 40px; height: 40px; border: 3px solid #f3f3f3; border-top: 3px solid var(--primary); border-radius: 50%; animation: spin 1s linear infinite;"></div>
+                <p style="margin-top: 15px; color: #61666d;">正在加载视频...</p>
+            </div>
+        `;
+        
         try {
             const res = await fetch('/api/videos');
             const videos = await res.json();
             
-            if (!videos || videos.length === 0) {
-                grid.innerHTML = '<p style="color:#888; grid-column:1/-1; text-align:center;">库里空空如也，去传个视频吧！</p>';
+            let filteredVideos = videos;
+            
+            // 应用搜索过滤
+            if (searchKeyword) {
+                const keyword = searchKeyword.toLowerCase();
+                filteredVideos = filteredVideos.filter(v => 
+                    v.filename.toLowerCase().includes(keyword)
+                );
+            }
+            
+            // 应用分类过滤
+            if (category) {
+                filteredVideos = filteredVideos.filter(v => 
+                    v.category === category
+                );
+            }
+            
+            // 应用排序
+            filteredVideos.sort((a, b) => {
+                switch (sort) {
+                    case 'name_asc':
+                        return a.filename.localeCompare(b.filename);
+                    case 'name_desc':
+                        return b.filename.localeCompare(a.filename);
+                    case 'time_asc':
+                        // 这里需要后端提供时间信息，暂时按文件名排序
+                        return a.filename.localeCompare(b.filename);
+                    case 'time_desc':
+                        // 这里需要后端提供时间信息，暂时按文件名倒序排序
+                        return b.filename.localeCompare(a.filename);
+                    default:
+                        return 0;
+                }
+            });
+            
+            if (!filteredVideos || filteredVideos.length === 0) {
+                if (searchKeyword || category) {
+                    grid.innerHTML = `
+                        <div style="grid-column:1/-1; text-align:center; padding: 60px 0; animation: fadeIn 0.5s ease;">
+                            <p style="font-size: 48px; margin: 0 0 10px 0;">🔍</p>
+                            <p style="color:#888; margin: 0;">没有找到相关视频</p>
+                        </div>
+                    `;
+                } else {
+                    grid.innerHTML = `
+                        <div style="grid-column:1/-1; text-align:center; padding: 60px 0; animation: fadeIn 0.5s ease;">
+                            <p style="font-size: 48px; margin: 0 0 10px 0;">📹</p>
+                            <p style="color:#888; margin: 0;">库里空空如也，去传个视频吧！</p>
+                        </div>
+                    `;
+                }
                 return;
             }
 
-            grid.innerHTML = videos.map(v => {
-                const displayTitle = v.replace(/\.mp4$/i, ''); 
-                
-                const coverUrl = `/uploads/${displayTitle}.jpg`; 
+            // 构建视频卡片HTML
+            const videoCards = filteredVideos.map(v => {
+                const displayTitle = v.filename.replace(/\.mp4$/i, ''); 
                 
                 return `
-                <a href="video.html?file=${encodeURIComponent(v)}" class="video-card">
+                <a href="video.html?file=${encodeURIComponent(v.filename)}" class="video-card">
                     <div class="cover-box">
                         <i style="color:#555">🎬</i>
-                        <img src="${coverUrl}" class="cover-img" onerror="this.style.display='none'">
+                        <video class="cover-video" data-src="/uploads/${encodeURIComponent(v.filename)}" style="display:none;"></video>
                     </div>
                     <div class="info">${displayTitle}</div>
                 </a>
                 `;
             }).join('');
+            
+            // 添加淡入动画
+            grid.innerHTML = videoCards;
+            // 为整个网格添加动画
+            grid.style.animation = 'fadeIn 0.6s ease';
+            
+            // 添加卡片动画
+            setTimeout(() => {
+                const cards = document.querySelectorAll('.video-card');
+                cards.forEach((card, index) => {
+                    setTimeout(() => {
+                        card.classList.add('animate');
+                    }, index * 50);
+                });
+            }, 100);
+            
+            // 生成视频封面
+            generateVideoCovers();
         } catch (e) {
-            grid.innerHTML = '<p style="text-align:center;">加载失败，请检查后端运行状态</p>';
+            grid.innerHTML = `
+                <div style="grid-column:1/-1; text-align:center; padding: 60px 0; animation: fadeIn 0.5s ease;">
+                    <p style="font-size: 48px; margin: 0 0 10px 0;">⚠️</p>
+                    <p style="color:#888; margin: 0;">加载失败，请检查后端运行状态</p>
+                </div>
+            `;
+            console.error('加载视频失败:', e);
         }
     }
-    window.onload = load;
+
+    // 加载分类列表
+    async function loadCategories() {
+        try {
+            const res = await fetch('/api/categories');
+            const categories = await res.json();
+            const categoryFilter = document.getElementById('categoryFilter');
+            
+            // 清空现有选项（保留第一个全部分类选项）
+            while (categoryFilter.options.length > 1) {
+                categoryFilter.remove(1);
+            }
+            
+            // 添加分类选项
+            categories.forEach(category => {
+                const option = document.createElement('option');
+                option.value = category;
+                option.textContent = category;
+                categoryFilter.appendChild(option);
+            });
+        } catch (e) {
+            console.error('加载分类失败:', e);
+        }
+    }
+
+    // 加载统计信息
+    async function loadStats() {
+        try {
+            const res = await fetch('/api/stats');
+            const stats = await res.json();
+            document.getElementById('totalVideos').textContent = stats.totalVideos;
+            document.getElementById('totalCategories').textContent = stats.totalCategories;
+        } catch (e) {
+            console.error('加载统计信息失败:', e);
+        }
+    }
+
+    window.onload = async function() {
+        await loadCategories();
+        await loadStats();
+        load();
+    };
+
+    // 上传、搜索和分类功能
+    document.addEventListener('DOMContentLoaded', function() {
+        const uploadBtn = document.getElementById('uploadBtn');
+        const uploadModal = document.getElementById('uploadModal');
+        const cancelUpload = document.getElementById('cancelUpload');
+        const uploadForm = document.getElementById('uploadForm');
+        const videoFile = document.getElementById('videoFile');
+        const uploadProgress = document.getElementById('uploadProgress');
+        const progressBar = document.getElementById('progressBar');
+        const progressText = document.getElementById('progressText');
+        const searchInput = document.getElementById('searchInput');
+        const searchBtn = document.getElementById('searchBtn');
+        const categoryFilter = document.getElementById('categoryFilter');
+        const sortOption = document.getElementById('sortOption');
+
+        // 上传功能
+        uploadBtn.addEventListener('click', function() {
+            uploadModal.style.display = 'flex';
+        });
+
+        cancelUpload.addEventListener('click', function() {
+            uploadModal.style.display = 'none';
+            uploadForm.reset();
+            uploadProgress.style.display = 'none';
+        });
+
+        uploadForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            if (!videoFile.files.length) {
+                alert('请选择要上传的视频文件');
+                return;
+            }
+
+            const file = videoFile.files[0];
+            const formData = new FormData();
+            formData.append('video', file);
+
+            uploadProgress.style.display = 'block';
+
+            fetch('/api/upload', {
+                method: 'POST',
+                body: formData
+            }).then(response => response.json())
+              .then(async data => {
+                  if (data.success) {
+                      alert('上传成功！');
+                      uploadModal.style.display = 'none';
+                      uploadForm.reset();
+                      uploadProgress.style.display = 'none';
+                      await loadStats(); // 刷新统计信息
+                      load(searchInput.value, categoryFilter.value, sortOption.value); // 刷新视频列表，保持搜索、分类和排序状态
+                  } else {
+                      alert('上传失败：' + (data.error || '未知错误'));
+                  }
+              })
+              .catch(error => {
+                  alert('上传失败：网络错误');
+                  console.error('上传错误:', error);
+              });
+        });
+
+        // 点击模态框外部关闭
+        uploadModal.addEventListener('click', function(e) {
+            if (e.target === uploadModal) {
+                uploadModal.classList.remove('show');
+                setTimeout(() => {
+                    uploadModal.style.display = 'none';
+                }, 300);
+                uploadForm.reset();
+                uploadProgress.style.display = 'none';
+            }
+        });
+
+        // 搜索功能
+        searchBtn.addEventListener('click', function() {
+            load(searchInput.value, categoryFilter.value, sortOption.value);
+        });
+
+        searchInput.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                load(searchInput.value, categoryFilter.value, sortOption.value);
+            }
+        });
+
+        // 分类过滤功能
+        categoryFilter.addEventListener('change', function() {
+            load(searchInput.value, categoryFilter.value, sortOption.value);
+        });
+
+        // 排序功能
+        sortOption.addEventListener('change', function() {
+            load(searchInput.value, categoryFilter.value, sortOption.value);
+        });
+    });
+    
+    // 生成视频封面
+    function generateVideoCovers() {
+        const videoElements = document.querySelectorAll('.cover-video');
+        videoElements.forEach(video => {
+            const videoUrl = video.dataset.src;
+            const coverBox = video.parentElement;
+            
+            // 创建视频元素用于加载
+            const tempVideo = document.createElement('video');
+            tempVideo.src = videoUrl;
+            tempVideo.crossOrigin = 'anonymous';
+            
+            tempVideo.addEventListener('loadedmetadata', function() {
+                // 跳转到视频的5%处
+                const seekTime = this.duration * 0.05;
+                this.currentTime = seekTime;
+            });
+            
+            tempVideo.addEventListener('seeked', function() {
+                // 创建画布并绘制帧
+                const canvas = document.createElement('canvas');
+                canvas.width = 640;
+                canvas.height = 360;
+                const ctx = canvas.getContext('2d');
+                ctx.drawImage(this, 0, 0, canvas.width, canvas.height);
+                
+                // 将画布转换为图片
+                const img = document.createElement('img');
+                img.src = canvas.toDataURL('image/jpeg');
+                img.className = 'cover-img';
+                
+                // 添加到封面盒子
+                coverBox.appendChild(img);
+                
+                // 隐藏图标
+                const icon = coverBox.querySelector('i');
+                if (icon) {
+                    icon.style.display = 'none';
+                }
+                
+                // 清理临时视频元素
+                this.remove();
+            });
+            
+            // 加载视频
+            tempVideo.load();
+        });
+    }
 </script>
 
 </body>
