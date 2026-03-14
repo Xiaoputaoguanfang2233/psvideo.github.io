@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>正在播放 - 番实视频站</title>
+    <style>
+        :root { --primary: #009A44; --bg: #f4f4f4; }
+        body { margin: 0; background: var(--bg); font-family: -apple-system, sans-serif; }
+        header { background: #fff; padding: 12px 15px; display: flex; align-items: center; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+        .back { text-decoration: none; color: var(--primary); font-size: 14px; font-weight: bold; }
+        .video-box { background: #000; width: 100%; aspect-ratio: 16/9; display: flex; align-items: center; justify-content: center; position: sticky; top: 0; z-index: 10; }
+        video { width: 100%; max-height: 100%; outline: none; }
+        .video-info { background: #fff; padding: 15px; margin-bottom: 10px; }
+        .video-title { font-size: 18px; font-weight: bold; margin-bottom: 12px; color: #18191c; }
+        .actions { display: flex; justify-content: space-around; padding: 10px 0; border-top: 1px solid #eee; }
+        .action-item { display: flex; flex-direction: column; align-items: center; font-size: 12px; color: #61666d; cursor: pointer; transition: 0.2s; }
+        .action-item span:first-child { font-size: 20px; margin-bottom: 4px; }
+        .comment-input-box { background: #fff; padding: 15px; border-bottom: 1px solid #eee; display: flex; gap: 10px; align-items: center; }
+        .comment-input-box input { flex: 1; padding: 10px; border: 1px solid #e3e5e7; border-radius: 6px; background: #f1f2f3; outline: none; }
+        .comment-input-box button { padding: 8px 16px; background: var(--primary); color: #fff; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; }
+        .comment-section { background: #fff; padding: 15px; min-height: 400px; }
+        .comment-count { font-size: 16px; color: #18191c; margin-bottom: 20px; font-weight: bold; }
+        .comment-item { display: flex; gap: 12px; margin-bottom: 20px; border-bottom: 1px solid #f1f2f3; padding-bottom: 15px; }
+        .avatar { width: 40px; height: 40px; background: #ddd; border-radius: 50%; flex-shrink: 0; }
+        .user-name { font-size: 13px; font-weight: bold; color: #61666d; margin-bottom: 4px; }
+        .user-name span { font-weight: normal; color: #9499a0; margin-left: 10px; font-size: 11px; }
+        .text { font-size: 14px; color: #18191c; line-height: 1.5; }
+
+        @media (min-width: 1024px) {
+            .video-box {
+                max-height: 65vh;
+                position: sticky;
+                top: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <a href="index.html" class="back">← 返回首页</a>
+</header>
+
+<div class="video-box" id="player"></div>
+
+<div class="video-info">
+    <div class="video-title" id="videoTitle">正在加载标题...</div>
+    <div class="actions">
+        <div class="action-item" onclick="handleLike()">
+            <span id="likeIcon">👍</span>
+            <span id="likeCountDisplay">点赞</span>
+        </div>
+    </div>
+</div>
+
+<div class="comment-input-box">
+    <input type="text" id="commentInput" placeholder="发条友善的评论吧...">
+    <button onclick="sendComment()">发布</button>
+</div>
+
+<div class="comment-section">
+    <div class="comment-count" id="commentCount">评论 (0)</div>
+    <div id="commentList"></div>
+</div>
+
+<script>
+    const urlParams = new URLSearchParams(window.location.search);
+    const fileName = urlParams.get('file');
+
+    if (fileName) {
+        document.getElementById('videoTitle').innerText = fileName.replace(/\.mp4$/i, '');
+        document.getElementById('player').innerHTML = `
+            <video controls autoplay><source src="/uploads/${fileName}" type="video/mp4"></video>
+        `;
+        refreshData();
+    }
+
+    async function refreshData() {
+        try {
+            // 添加时间戳避免缓存
+            const res = await fetch(`/api/get-data?videoId=${encodeURIComponent(fileName)}&_=${Date.now()}`);
+            const data = await res.json();
+            
+            // 更新点赞数
+            document.getElementById('likeCountDisplay').innerText = data.likes > 0 ? data.likes : '点赞';
+            
+            // 更新评论列表
+            document.getElementById('commentCount').innerText = `评论 (${data.comments.length})`;
+            const list = document.getElementById('commentList');
+            list.innerHTML = data.comments.reverse().map(c => `
+                <div class="comment-item">
+                    <div class="avatar"></div>
+                    <div class="c-content">
+                        <div class="user-name">${c.user} <span>${c.time}</span></div>
+                        <div class="text">${c.content}</div>
+                    </div>
+                </div>
+            `).join('') || '<p style="text-align:center;color:#999;padding-top:20px;">暂无评论，快来抢沙发！</p>';
+        } catch (e) { console.error("数据加载失败"); }
+    }
+
+    async function sendComment() {
+        const input = document.getElementById('commentInput');
+        if (!input.value.trim()) return;
+
+        //检查响应状态并给出提示
+        try {
+            const res = await fetch('/api/add-comment', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({ videoId: fileName, content: input.value, user: '访客' })
+            });
+            if (res.ok) {
+                input.value = '';
+                refreshData();
+            } else {
+                const err = await res.json();
+                alert('评论发布失败：' + (err.error || '服务器错误'));
+            }
+        } catch (e) {
+            alert('网络错误，请稍后重试');
+        }
+    }
+
+    async function handleLike() {
+        //检查响应状态并给出提示
+        try {
+            const res = await fetch('/api/add-like', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({ videoId: fileName })
+            });
+            if (res.ok) {
+                const data = await res.json();
+                document.getElementById('likeCountDisplay').innerText = data.likes;
+                document.getElementById('likeIcon').innerText = '❤️';
+            } else {
+                const err = await res.json();
+                alert('点赞失败：' + (err.error || '服务器错误'));
+            }
+        } catch (e) {
+            alert('网络错误，请稍后重试');
+        }
+    }
+</script>
+</body>
+</html>
